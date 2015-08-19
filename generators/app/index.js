@@ -64,6 +64,8 @@ module.exports = yeoman.generators.Base.extend({
   writing: {
 
     app: function(){
+
+      console.log('I am path' + process.env.PWD);
       this.template('_package.json', 'package.json');
       this.template('gulpfile.js', 'gulpfile.js');
       this.template('_gitignore', '.gitignore');
@@ -76,15 +78,17 @@ module.exports = yeoman.generators.Base.extend({
       this.mkdir('src/p/index');
       this.mkdir('src/c/lib');
 
-      this.copy('src/p/index/index.js', 'src/p/index/index.js');
       this.copy('src/p/index/index.less', 'src/p/index/index.less');
 
       if(this.isZepto) {
         this.copy('src/c/lib/zepto.js', 'src/c/lib/zepto.js');  
+         this.copy('src/p/index/index_zepto.js', 'src/p/index/index.js');
       } else if(this.isJquery1) {
         this.copy('src/c/lib/jquery-1.11.3.min.js', 'src/c/lib/jquery-1.11.3.min.js');
+         this.copy('src/p/index/index_jquery1.js', 'src/p/index/index.js');
       } else {
         this.copy('src/c/lib/jquery-2.1.4.min.js', 'src/c/lib/jquery-2.1.4.min.js');
+         this.copy('src/p/index/index_jquery2.js', 'src/p/index/index.js');
       }
 
       this.copy('demo/index.html', 'demo/index.html');
