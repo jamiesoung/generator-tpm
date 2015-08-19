@@ -64,11 +64,7 @@ module.exports = yeoman.generators.Base.extend({
   writing: {
 
     app: function(){
-
-      var dir = process.env.PWD;
-
-      console.log('path' + dir);
-      this.template('_package.json', path.join(dir, 'package.json'));
+      this.template('_package.json', 'package.json');
       this.template('gulpfile.js', 'gulpfile.js');
       this.template('_gitignore', '.gitignore');
 
