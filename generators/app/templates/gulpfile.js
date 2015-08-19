@@ -7,17 +7,15 @@ var path = require('path');
 var fs = require('fs');
 
 // 起本地服务器
-// var connect = require('gulp-connect');
+var connect = require('gulp-connect');
 
 var gulp = require('gulp');
 
 // ES6 to ES5
 var rimraf = require('gulp-rimraf');
-
 var gutil = require('gulp-util');
 
 // 支持
-
 var browserify = require('browserify');
 var globby = require('globby');
 
@@ -71,8 +69,7 @@ gulp.task('js', function() {
 	  		browserify(filePath)
 		    .bundle()
 		    .on('error', function(err) {
-
-		  		
+	
 				if(!isError) {
 					gutil.log(err);
 					isError = true;
@@ -132,7 +129,6 @@ gulp.task('dev', [
 gulp.task('watch', function() {
 
 	gulp.watch(SRC_BASE + '/**/*', ['default']);
-	
 	
 });
 
