@@ -2,13 +2,11 @@
 /*
  ** 前端代码的打包编译和压缩
 */
-
 var path = require('path');
 var fs = require('fs');
 
 // 起本地服务器
 var connect = require('gulp-connect');
-
 var gulp = require('gulp');
 
 // ES6 to ES5
