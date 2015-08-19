@@ -79,6 +79,7 @@ module.exports = yeoman.generators.Base.extend({
       this.mkdir('src/c/lib');
 
       this.copy('src/p/index/index.less', 'src/p/index/index.less');
+      this.copy('README.md', 'README.md');
 
       if(this.isZepto) {
         this.copy('src/c/lib/zepto.js', 'src/c/lib/zepto.js');  
