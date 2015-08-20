@@ -14,16 +14,13 @@ var rimraf = require('gulp-rimraf');
 var gutil = require('gulp-util');
 
 // 支持
+
 var browserify = require('browserify');
 var globby = require('globby');
 
 // 资源类型转换
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
-
-// 修改文件的名称
-var rename = require('gulp-rename');
-var streamify = require('gulp-streamify');
 
 // js 压缩
 var uglify = require('gulp-uglify');
@@ -34,9 +31,9 @@ var less = require('gulp-less');
 var SRC_BASE = './src';
 var BUILD_BASE = './build';
 var DEV_BASE = './dev';
+var DEMO_BASE = './demo';
 
 var SCRIPTS = SRC_BASE + '/p/*/index.js';
-
 var LIB_BASE = [SRC_BASE + '/c/lib/*.js', SRC_BASE + '/c/lib/*.css'];
 
 // clean
@@ -67,20 +64,16 @@ gulp.task('js', function() {
 	  		browserify(filePath)
 		    .bundle()
 		    .on('error', function(err) {
-	
+
 				if(!isError) {
 					gutil.log(err);
 					isError = true;
 				}
 			})
 		    .pipe(source('index.js'))
-		    .pipe(streamify())
 		    .pipe(gulp.dest(DEV_BASE + '/' + pageName))
 		    .pipe(buffer())
 		    .pipe(uglify())
-		    .pipe(rename({
-			  	suffix: '.min'
-			 }))
 		    .pipe(gulp.dest(BUILD_BASE + '/' + pageName))
 		})
 	});
@@ -89,10 +82,8 @@ gulp.task('js', function() {
 // less编译 及 打包
 gulp.task('less', function() {
 
-	gulp.src(SRC_BASE + '/**/*.less')
-		.pipe(less({
-      			paths: [ path.join(__dirname, 'less', 'includes') ]
-    		}).on('error', function(err){
+	gulp.src(SRC_BASE + '/p/*/index.less')
+		.pipe(less().on('error', function(err){
     			gutil.log(err);
     		}))
 		.pipe(minify())

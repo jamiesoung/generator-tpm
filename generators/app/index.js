@@ -43,34 +43,30 @@ module.exports = yeoman.generators.Base.extend({
 
           name: 'mobile',
           value: 'mobile'
-        },
-        {
-          name: 'pc',
-          value: 'pc'
         }
         ]
       }
       
     ];
 
-    var prompts_v = [
-      {
+    // var prompts_v = [
+    //   {
 
-        type: 'list',
-        name: 'jquery',
-        message: 'Please choose jquery version.',
-        choices : [{
+    //     type: 'list',
+    //     name: 'jquery',
+    //     message: 'Please choose jquery version.',
+    //     choices : [{
 
-          name: 'jquery(1.11.3)',
-          value: 'jquery1'
-        },
-        {
-          name: 'jquery(2.1.4，不支持ie6-8)',
-          value: 'jquery2'
-        }
-        ]
-      }
-    ];
+    //       name: 'jquery(1.11.3)',
+    //       value: 'jquery1'
+    //     },
+    //     {
+    //       name: 'jquery(2.1.4，不支持ie6-8)',
+    //       value: 'jquery2'
+    //     }
+    //     ]
+    //   }
+    // ];
 
     this.prompt(prompts, function (props) {
 
@@ -80,26 +76,26 @@ module.exports = yeoman.generators.Base.extend({
       }
 
       this.isMobile = chooseFeature('mobile');
-      this.isPC = chooseFeature('pc');
+      // this.isPC = chooseFeature('pc');
 
       // 选择 jquery 版本
-      if(this.isPC) {
+      // if(this.isPC) {
 
-        this.prompt(prompts_v, function(choices) {
+      //   this.prompt(prompts_v, function(choices) {
 
-          function chooseVersion(choice) {
-            return choices.jquery.indexOf(choice) !== -1;
-          }
+      //     function chooseVersion(choice) {
+      //       return choices.jquery.indexOf(choice) !== -1;
+      //     }
 
-          this.isJquery1 = chooseVersion('jquery1');
-          this.isJquery2 = chooseVersion('jquery2');
+      //     this.isJquery1 = chooseVersion('jquery1');
+      //     this.isJquery2 = chooseVersion('jquery2');
           
-          done();
-        }.bind(this));
-      }
+      //     done();
+      //   }.bind(this));
+      // }
       
       // To access props later use this.props.someOption;
-
+      done();
     }.bind(this));
   },
 
@@ -122,16 +118,16 @@ module.exports = yeoman.generators.Base.extend({
       this.copy('src/p/index/index.less', 'src/p/index/index.less');
       this.copy('README.md', 'README.md');
 
-      if(this.isMobile) {
+      // if(this.isMobile) {
       this.copy('src/c/lib/zepto.js', 'src/c/lib/zepto.js');  
       this.copy('src/p/index/index_zepto.js', 'src/p/index/index.js');
-      } else if(this.isJquery1) {
-        this.copy('src/c/lib/jquery-1.11.3.min.js', 'src/c/lib/jquery-1.11.3.min.js');
-         this.copy('src/p/index/index_jquery1.js', 'src/p/index/index.js');
-      } else {
-        this.copy('src/c/lib/jquery-2.1.4.min.js', 'src/c/lib/jquery-2.1.4.min.js');
-         this.copy('src/p/index/index_jquery2.js', 'src/p/index/index.js');
-      }
+      // } else if(this.isJquery1) {
+      //   this.copy('src/c/lib/jquery-1.11.3.min.js', 'src/c/lib/jquery-1.11.3.min.js');
+      //    this.copy('src/p/index/index_jquery1.js', 'src/p/index/index.js');
+      // } else {
+      //   this.copy('src/c/lib/jquery-2.1.4.min.js', 'src/c/lib/jquery-2.1.4.min.js');
+      //    this.copy('src/p/index/index_jquery2.js', 'src/p/index/index.js');
+      // }
       this.copy('demo/index.html', 'demo/index.html');
     }
 
