@@ -2,19 +2,15 @@
 /*
  ** 前端代码的打包编译和压缩
 */
+
 var path = require('path');
 var fs = require('fs');
 
 // 起本地服务器
-var connect = require('gulp-connect');
 var gulp = require('gulp');
 
-// ES6 to ES5
 var rimraf = require('gulp-rimraf');
 var gutil = require('gulp-util');
-
-// 支持
-
 var browserify = require('browserify');
 var globby = require('globby');
 
@@ -27,6 +23,9 @@ var uglify = require('gulp-uglify');
 var minify = require('gulp-minify-css');
 var less = require('gulp-less');
 
+// browserSync
+var browserSync = require('browser-sync').create();
+
 // 资源地址
 var SRC_BASE = './src';
 var BUILD_BASE = './build';
@@ -35,12 +34,6 @@ var DEMO_BASE = './demo';
 
 var SCRIPTS = SRC_BASE + '/p/*/index.js';
 var LIB_BASE = [SRC_BASE + '/c/lib/*.js', SRC_BASE + '/c/lib/*.css'];
-
-// clean
-gulp.task('clean', function() {
-	gulp.src(BUILD_BASE, {read: false})
-		.pipe(rimraf({force: true}));
-});
 
 // js 打包 browserify 版
 gulp.task('js', function() {
@@ -75,7 +68,7 @@ gulp.task('js', function() {
 		    .pipe(buffer())
 		    .pipe(uglify())
 		    .pipe(gulp.dest(BUILD_BASE + '/' + pageName))
-		})
+		});
 	});
 });
 
@@ -91,6 +84,7 @@ gulp.task('less', function() {
 			gutil.log('less error');
 		})
 		.pipe(gulp.dest(BUILD_BASE))
+		.pipe(browserSync.stream({match: '**/*.css'}))
 });
 
 // copy 
@@ -100,26 +94,26 @@ gulp.task('lib', function() {
 		.pipe(gulp.dest(BUILD_BASE + '/lib'));
 });
 
-// dev
-gulp.task('dev:server', function() {
-    connect.server({
-        root: './',
-        port: 8181,
-        livereload: true
-    });
-});
-
-gulp.task('dev', [
-    'dev:server',
-    'watch'
-]);
-
 // watch
-gulp.task('watch', function() {
+gulp.task('watch', ['less'], function() {
 
-	gulp.watch(SRC_BASE + '/**/*', ['default']);
+	browserSync.init({
+		server: {
+			baseDir: './',
+			index: '/index.html'
+		},
+		startPath: './demo'
+	});
+
+	gulp.watch(DEMO_BASE + "/**/*.html").on('change', browserSync.reload);
+	gulp.watch(SRC_BASE + '/**/*.js', ['build-js']);
+	gulp.watch(SRC_BASE + '/**/*.less', ['less'])
 	
 });
 
-gulp.task('default', ['js', 'less']);
+
+gulp.task('build-js', ['js'], browserSync.reload);
+gulp.task('build', ['js', 'less'], browserSync.reload);
+
+gulp.task('default', ['build']);
 
