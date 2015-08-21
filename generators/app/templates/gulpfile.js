@@ -1,4 +1,3 @@
-var streamify = require('gulp-streamify');
 
 /*
  ** 前端代码的打包编译和压缩
@@ -34,10 +33,10 @@ var BUILD_BASE = './build';
 var DEV_BASE = './dev';
 var DEMO_BASE = './demo';
 
-var SCRIPTS = SRC_BASE + '/p/*/index.js';
+var SCRIPTS = SRC_BASE + '/**/*/index.js';
 var LIB_SCRIPT = SRC_BASE + '/c/lib/*.js';
 var LIB_STYLE = SRC_BASE + '/c/lib/*.css';
-var STYLES = SRC_BASE + '/p/*/index.less';
+var STYLES = SRC_BASE + '/**/*/index.less';
 
 // clean
 gulp.task('clean', function() {
@@ -50,19 +49,24 @@ gulp.task('js', function() {
 
 	var isError = false;
 
-	globby([SCRIPTS], function(err, filePaths) {
+	globby([SCRIPTS, LIB_SCRIPT], function(err, filePaths) {
 
 		if(err) {
 			gutil.log('globby error');
 			return ;
 		}
 
+		console.log('js 打包中...');
+
 		// 打包压缩文件到 build
 		// browserify 一次只能接受一个文件
 		filePaths.forEach(function(filePath) {
 		
-			var pageNameReg = new RegExp(SRC_BASE + '\/p\/(.*)\/');
-	        var pageName = filePath.match(pageNameReg)[1];
+			var pageNameReg = new RegExp(SRC_BASE + '\/*\/(.*)\/');
+	        var pageName = filePath.match(pageNameReg)[1].split('/')[1];
+
+	        var fileList = filePath.split('/');
+	        var fileName = fileList[fileList.length - 1];
 
 	  		browserify(filePath)
 		    .bundle()
@@ -73,7 +77,7 @@ gulp.task('js', function() {
 					isError = true;
 				}
 			})
-		    .pipe(source('index.js'))
+		    .pipe(source(fileName))
 		    .pipe(gulp.dest(DEV_BASE + '/' + pageName))
 		    .pipe(buffer())
 		    .pipe(uglify())
@@ -85,18 +89,19 @@ gulp.task('js', function() {
 // less编译 及 打包
 gulp.task('less', function() {
 
-	globby([STYLES], function(err, filePaths) {
+	globby([STYLES, LIB_STYLE], function(err, filePaths) {
 
 		if(err) {
 			gutil.log('globby error');
 			return ;
 		}
+		console.log('less编译中...');
 
 		filePaths.forEach(function(filePath) {
-			var pageNameReg = new RegExp(SRC_BASE + '\/p\/(.*)\/');
-	        var pageName = filePath.match(pageNameReg)[1];
+			var pageNameReg = new RegExp(SRC_BASE + '\/*\/(.*)\/');
+	        var pageName = filePath.match(pageNameReg)[1].split('/')[1];
 
-	        gulp.src(SRC_BASE + '/p/'+ pageName +'/index.less')
+	        gulp.src(filePath)
 		        .pipe(less().on('error', function(err){
 		        	gutil.log('Less error, the director name is:' + pageName);
 	    			gutil.log(err);
@@ -111,21 +116,8 @@ gulp.task('less', function() {
 	});
 });
 
-// lib目录打包和压缩
-gulp.task('lib', function() {
-
-	browserify(LIB_SCRIPT)
-		.bundle()
-		.pipe(uglify())
-		.pipe(gulp.dest(BUILD_BASE + '/lib'));
-
-	gulp.src(LIB_STYLE)
-		.pipe(minify())
-		.pipe(gulp.dest(BUILD_BASE + '/lib'));
-});
-
 // watch
-gulp.task('watch', ['less', 'lib'], function() {
+gulp.task('watch', ['less'], function() {
 
 	browserSync.init({
 		server: {
@@ -143,7 +135,7 @@ gulp.task('watch', ['less', 'lib'], function() {
 
 
 gulp.task('build-js', ['js'], browserSync.reload);
-gulp.task('build', ['js', 'less', 'lib'], browserSync.reload);
+gulp.task('build', ['less', 'js'], browserSync.reload);
 
 gulp.task('default', ['build']);
 
