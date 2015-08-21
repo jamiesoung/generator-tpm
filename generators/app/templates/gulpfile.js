@@ -1,3 +1,4 @@
+var streamify = require('gulp-streamify');
 
 /*
  ** 前端代码的打包编译和压缩
@@ -34,7 +35,8 @@ var DEV_BASE = './dev';
 var DEMO_BASE = './demo';
 
 var SCRIPTS = SRC_BASE + '/p/*/index.js';
-var LIB_BASE = [SRC_BASE + '/c/lib/*.js', SRC_BASE + '/c/lib/*.css'];
+var LIB_SCRIPT = SRC_BASE + '/c/lib/*.js';
+var LIB_STYLE = SRC_BASE + '/c/lib/*.css';
 var STYLES = SRC_BASE + '/p/*/index.less';
 
 // clean
@@ -49,7 +51,6 @@ gulp.task('js', function() {
 	var isError = false;
 
 	globby([SCRIPTS], function(err, filePaths) {
-
 
 		if(err) {
 			gutil.log('globby error');
@@ -110,10 +111,16 @@ gulp.task('less', function() {
 	});
 });
 
-// copy 
+// lib目录打包和压缩
 gulp.task('lib', function() {
 
-	gulp.src(LIB_BASE)
+	browserify(LIB_SCRIPT)
+		.bundle()
+		.pipe(uglify())
+		.pipe(gulp.dest(BUILD_BASE + '/lib'));
+
+	gulp.src(LIB_STYLE)
+		.pipe(minify())
 		.pipe(gulp.dest(BUILD_BASE + '/lib'));
 });
 
