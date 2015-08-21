@@ -117,22 +117,8 @@ gulp.task('lib', function() {
 		.pipe(gulp.dest(BUILD_BASE + '/lib'));
 });
 
-// dev
-// gulp.task('dev:server', function() {
-//     connect.server({
-//         root: './',
-//         port: 8181,
-//         livereload: true
-//     });
-// });
-
-// gulp.task('dev', [
-//     'dev:server',
-//     'watch'
-// ]);
-
 // watch
-gulp.task('watch', ['less'], function() {
+gulp.task('watch', ['less', 'lib'], function() {
 
 	browserSync.init({
 		server: {
@@ -150,7 +136,7 @@ gulp.task('watch', ['less'], function() {
 
 
 gulp.task('build-js', ['js'], browserSync.reload);
-gulp.task('build', ['js', 'less'], browserSync.reload);
+gulp.task('build', ['js', 'less', 'lib'], browserSync.reload);
 
 gulp.task('default', ['build']);
 
