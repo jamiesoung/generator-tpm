@@ -7,6 +7,7 @@ var path = require('path');
 var fs = require('fs');
 
 // 起本地服务器
+// var connect = require('gulp-connect');
 var gulp = require('gulp');
 
 var rimraf = require('gulp-rimraf');
@@ -34,6 +35,13 @@ var DEMO_BASE = './demo';
 
 var SCRIPTS = SRC_BASE + '/p/*/index.js';
 var LIB_BASE = [SRC_BASE + '/c/lib/*.js', SRC_BASE + '/c/lib/*.css'];
+var STYLES = SRC_BASE + '/p/*/index.less';
+
+// clean
+gulp.task('clean', function() {
+	// gulp.src(BUILD_BASE, {read: false})
+	// 	.pipe(rimraf({force: true}));
+});
 
 // js 打包 browserify 版
 gulp.task('js', function() {
@@ -41,6 +49,7 @@ gulp.task('js', function() {
 	var isError = false;
 
 	globby([SCRIPTS], function(err, filePaths) {
+
 
 		if(err) {
 			gutil.log('globby error');
@@ -75,16 +84,30 @@ gulp.task('js', function() {
 // less编译 及 打包
 gulp.task('less', function() {
 
-	gulp.src(SRC_BASE + '/p/*/index.less')
-		.pipe(less().on('error', function(err){
-    			gutil.log(err);
-    		}))
-		.pipe(minify())
-		.on('error', function(err) {
-			gutil.log('less error');
-		})
-		.pipe(gulp.dest(BUILD_BASE))
-		.pipe(browserSync.stream({match: '**/*.css'}))
+	globby([STYLES], function(err, filePaths) {
+
+		if(err) {
+			gutil.log('globby error');
+			return ;
+		}
+
+		filePaths.forEach(function(filePath) {
+			var pageNameReg = new RegExp(SRC_BASE + '\/p\/(.*)\/');
+	        var pageName = filePath.match(pageNameReg)[1];
+
+	        gulp.src(SRC_BASE + '/p/'+ pageName +'/index.less')
+		        .pipe(less().on('error', function(err){
+		        	gutil.log('Less error, the director name is:' + pageName);
+	    			gutil.log(err);
+	    		}))
+				.pipe(minify())
+				.on('error', function(err) {
+					gutil.log('Less error, the director name is:' + pageName);
+				})
+				.pipe(gulp.dest(BUILD_BASE + '/' + pageName))
+				.pipe(browserSync.stream({match: '**/*.css'}))
+		});
+	});
 });
 
 // copy 
@@ -93,6 +116,20 @@ gulp.task('lib', function() {
 	gulp.src(LIB_BASE)
 		.pipe(gulp.dest(BUILD_BASE + '/lib'));
 });
+
+// dev
+// gulp.task('dev:server', function() {
+//     connect.server({
+//         root: './',
+//         port: 8181,
+//         livereload: true
+//     });
+// });
+
+// gulp.task('dev', [
+//     'dev:server',
+//     'watch'
+// ]);
 
 // watch
 gulp.task('watch', ['less'], function() {
