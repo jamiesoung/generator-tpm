@@ -38,6 +38,16 @@ var LIB_SCRIPT = SRC_BASE + '/c/lib/*.js';
 var LIB_STYLE = SRC_BASE + '/c/lib/*.css';
 var STYLES = SRC_BASE + '/**/*/index.less';
 
+
+function isLib(list) {
+
+	var len = list.length;
+	for(var i = 0; i < len; i++) {
+		if(list[i] === 'lib') return true;
+	}
+
+	return false;
+}
 // clean
 gulp.task('clean', function() {
 	// gulp.src(BUILD_BASE, {read: false})
@@ -55,9 +65,7 @@ gulp.task('js', function() {
 			gutil.log('globby error');
 			return ;
 		}
-
 		console.log('js 打包中...');
-
 		// 打包压缩文件到 build
 		// browserify 一次只能接受一个文件
 		filePaths.forEach(function(filePath) {
@@ -68,20 +76,37 @@ gulp.task('js', function() {
 	        var fileList = filePath.split('/');
 	        var fileName = fileList[fileList.length - 1];
 
-	  		browserify(filePath)
-		    .bundle()
-		    .on('error', function(err) {
+	        if(isLib(fileList)) {
+	        	browserify(filePath)
+			    .bundle()
+			    .on('error', function(err) {
 
-				if(!isError) {
-					gutil.log(err);
-					isError = true;
-				}
-			})
-		    .pipe(source(fileName))
-		    .pipe(gulp.dest(DEV_BASE + '/' + pageName))
-		    .pipe(buffer())
-		    .pipe(uglify())
-		    .pipe(gulp.dest(BUILD_BASE + '/' + pageName))
+					if(!isError) {
+						gutil.log(err);
+						isError = true;
+					}
+				})
+			    .pipe(source(fileName))
+			    .pipe(gulp.dest(BUILD_BASE + '/' + pageName))
+
+	        } else {
+	        	
+	        	browserify(filePath)
+			    .bundle()
+			    .on('error', function(err) {
+
+					if(!isError) {
+						gutil.log(err);
+						isError = true;
+					}
+				})
+			    .pipe(source(fileName))
+			    .pipe(gulp.dest(DEV_BASE + '/' + pageName))
+			    .pipe(buffer())
+			    .pipe(uglify())
+			    .pipe(gulp.dest(BUILD_BASE + '/' + pageName))
+	        }
+	  		
 		});
 	});
 });
